@@ -3,35 +3,52 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 
 const SESSION_COOKIE = "admin_session";
-const sessions = new Set<string>();
+const MAX_AGE = 60 * 60 * 24; // 24 hours
+
+function getSecret(): string {
+  return process.env.ADMIN_PASSWORD || "";
+}
+
+function sign(payload: string): string {
+  const hmac = crypto.createHmac("sha256", getSecret());
+  hmac.update(payload);
+  return hmac.digest("hex");
+}
+
+function createToken(): string {
+  const expires = Date.now() + MAX_AGE * 1000;
+  const payload = String(expires);
+  const signature = sign(payload);
+  return `${payload}.${signature}`;
+}
+
+function verifyToken(token: string): boolean {
+  const [payload, signature] = token.split(".");
+  if (!payload || !signature) return false;
+
+  const expires = Number(payload);
+  if (isNaN(expires) || Date.now() > expires) return false;
+
+  const expected = sign(payload);
+  return crypto.timingSafeEqual(
+    Buffer.from(signature, "hex"),
+    Buffer.from(expected, "hex")
+  );
+}
 
 export function login(password: string): string | null {
   if (password !== process.env.ADMIN_PASSWORD) {
     return null;
   }
-  const token = crypto.randomUUID();
-  sessions.add(token);
-  return token;
-}
-
-export function logout(token: string): void {
-  sessions.delete(token);
-}
-
-export function isValidSession(token: string): boolean {
-  return sessions.has(token);
-}
-
-export async function getSessionToken(): Promise<string | undefined> {
-  const cookieStore = await cookies();
-  return cookieStore.get(SESSION_COOKIE)?.value;
+  return createToken();
 }
 
 export async function requireAuth(): Promise<
   { authenticated: true } | { authenticated: false; response: NextResponse }
 > {
-  const token = await getSessionToken();
-  if (!token || !isValidSession(token)) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!token || !verifyToken(token)) {
     return {
       authenticated: false,
       response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
@@ -46,7 +63,7 @@ export function createSessionResponse(token: string): NextResponse {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: MAX_AGE,
   });
   return response;
 }
