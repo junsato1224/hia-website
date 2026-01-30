@@ -32,6 +32,7 @@ async function writeNews(articles: NewsArticle[]): Promise<void> {
   await put(BLOB_PATH, JSON.stringify(articles, null, 2), {
     access: "public",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: "application/json",
   });
 }
