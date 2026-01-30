@@ -1,4 +1,5 @@
 import { put, list } from "@vercel/blob";
+import { unstable_noStore as noStore } from "next/cache";
 import fs from "fs";
 import path from "path";
 import type { NewsArticle } from "@/types";
@@ -19,6 +20,8 @@ export async function readNews(): Promise<NewsArticle[]> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     return readLocalNews();
   }
+
+  noStore();
 
   const { blobs } = await list({ prefix: BLOB_PATH });
   if (blobs.length === 0) {
