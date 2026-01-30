@@ -1,57 +1,16 @@
 import type { NewsArticle } from "@/types";
+import { readNews } from "@/lib/news-store";
 
-export const newsArticles: NewsArticle[] = [
-  {
-    slug: "spring-program-2026",
-    title: "2026年度 春の体験プログラム参加者募集のお知らせ",
-    date: "2026-02-01",
-    category: "イベント",
-    excerpt:
-      "今年も春の体験プログラムを開催します。自然の中で新しい発見をしませんか。",
-    body: `HUMAN INFINITY ACADEMY では、2026年度の春の体験プログラムの参加者を募集しています。
-
-自然豊かなフィールドで、子どもたちが自分のペースで学び、発見し、成長できるプログラムです。
-
-専門のメンターが一人ひとりに寄り添い、安心して挑戦できる環境をつくります。
-
-詳細・お申込みについては、お問い合わせフォームよりご連絡ください。`,
-  },
-  {
-    slug: "website-launch",
-    title: "公式ウェブサイトを公開しました",
-    date: "2026-01-30",
-    category: "お知らせ",
-    excerpt:
-      "HUMAN INFINITY ACADEMY の公式ウェブサイトを公開しました。活動内容や支援方法をご覧いただけます。",
-    body: `このたび、一般社団法人 HUMAN INFINITY ACADEMY の公式ウェブサイトを公開いたしました。
-
-当サイトでは、私たちの理念や活動内容、プログラムの詳細、ご支援の方法などをご紹介しています。
-
-今後も活動の様子やお知らせを随時更新してまいります。どうぞよろしくお願いいたします。`,
-  },
-  {
-    slug: "mentor-recruitment",
-    title: "ボランティアメンター募集を開始します",
-    date: "2026-01-01",
-    category: "お知らせ",
-    excerpt:
-      "子どもたちの学びと成長を一緒に支えてくださるメンターを募集しています。",
-    body: `HUMAN INFINITY ACADEMY では、子どもたちの成長を支えるボランティアメンターを募集しています。
-
-特別な資格は必要ありません。子どもたちと一緒に過ごし、寄り添い、応援してくださる方を歓迎します。
-
-週末のプログラムへの参加や、オンラインでのサポートなど、ご自身のペースで活動いただけます。
-
-ご関心のある方は、お問い合わせフォームより「ボランティア」を選択のうえ、ご連絡ください。`,
-  }
-];
+export function getNewsArticles(): NewsArticle[] {
+  return readNews();
+}
 
 export function getNewsArticle(slug: string): NewsArticle | undefined {
-  return newsArticles.find((a) => a.slug === slug);
+  return readNews().find((a) => a.slug === slug);
 }
 
 export function getLatestNews(count: number): NewsArticle[] {
-  return [...newsArticles]
+  return readNews()
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, count);
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { Container } from "@/components/shared/container";
-import { newsArticles } from "@/data/news";
+import { getNewsArticles } from "@/data/news";
 
 export const metadata: Metadata = {
   title: "お知らせ",
@@ -22,7 +22,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function NewsPage() {
-  const sorted = [...newsArticles].sort((a, b) =>
+  const sorted = getNewsArticles().sort((a, b) =>
     b.date.localeCompare(a.date)
   );
 

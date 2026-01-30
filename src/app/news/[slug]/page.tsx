@@ -3,14 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Container } from "@/components/shared/container";
-import { newsArticles, getNewsArticle } from "@/data/news";
+import { getNewsArticles, getNewsArticle } from "@/data/news";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  return newsArticles.map((article) => ({
+  return getNewsArticles().map((article) => ({
     slug: article.slug,
   }));
 }
