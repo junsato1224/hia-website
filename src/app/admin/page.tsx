@@ -18,7 +18,7 @@ export default function AdminPage() {
   const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
 
   async function fetchArticles() {
-    const res = await fetch("/api/admin/news");
+    const res = await fetch(`/api/admin/news?t=${Date.now()}`);
     if (res.status === 401) {
       router.push("/admin/login");
       return;
