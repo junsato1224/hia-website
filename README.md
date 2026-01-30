@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HUMAN INFINITY ACADEMY 公式Webサイト
 
-## Getting Started
+一般社団法人 HUMAN INFINITY ACADEMY（HIA）の公式Webサイトです。
 
-First, run the development server:
+## 技術スタック
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui (Button / Card / Accordion)
+- Google Fonts (Zen Maru Gothic / Nunito)
+
+## セットアップ
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` でサイトが表示されます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## デプロイ (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. GitHubリポジトリにプッシュ
+2. [Vercel](https://vercel.com) でリポジトリをインポート
+3. 設定はデフォルトのままデプロイ（自動検出されます）
 
-## Learn More
+## 差し替えポイント
 
-To learn more about Next.js, take a look at the following resources:
+### 画像
+- `public/images/ogp.png` — OGP画像（1200x630px推奨）
+- `public/images/logo.svg` — サイトロゴ（ヘッダーで使用する場合）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### お問い合わせフォーム
+- `src/app/api/contact/route.ts` — 現在はコンソールログ出力のみ
+  - メール送信サービス（SendGrid、Resend等）に差し替え可能
+  - 環境変数でAPI keyを管理する想定
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### ニュース記事
+- `src/data/news.ts` — 記事データを追加・編集
+  - CMSに移行する場合はこのファイルのフェッチ部分を差し替え
 
-## Deploy on Vercel
+### 寄付・決済
+- `src/app/support/page.tsx` — 現在は「準備中」表記
+  - Stripe等の決済サービス導入時に差し替え
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### メタデータ
+- `src/app/layout.tsx` — サイト全体のtitle、description、OGP
+- 各ページの `metadata` export — ページ固有のSEO情報
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### フォント
+- `src/lib/fonts.ts` — Google Fonts設定（Zen Maru Gothic / Nunito）
+
+### カラーパレット
+- `src/app/globals.css` — `:root` セクションでCSS変数を管理
+
+## ページ構成
+
+| パス | ページ |
+|------|--------|
+| `/` | トップページ |
+| `/about` | HIAについて |
+| `/program` | プログラム |
+| `/support` | 支援する |
+| `/news` | お知らせ一覧 |
+| `/news/[slug]` | お知らせ詳細 |
+| `/contact` | お問い合わせ |
+| `/contact/thanks` | 送信完了 |
+| `/privacy` | プライバシーポリシー |
