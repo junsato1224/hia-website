@@ -3,21 +3,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Container } from "@/components/shared/container";
-import { getNewsArticles, getNewsArticle } from "@/data/news";
+import { getNewsArticle } from "@/data/news";
+
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  return getNewsArticles().map((article) => ({
-    slug: article.slug,
-  }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = getNewsArticle(slug);
+  const article = await getNewsArticle(slug);
   if (!article) return { title: "記事が見つかりません" };
   return {
     title: article.title,
@@ -39,7 +35,7 @@ const categoryColors: Record<string, string> = {
 
 export default async function NewsDetailPage({ params }: Props) {
   const { slug } = await params;
-  const article = getNewsArticle(slug);
+  const article = await getNewsArticle(slug);
 
   if (!article) {
     notFound();

@@ -4,6 +4,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Container } from "@/components/shared/container";
 import { getNewsArticles } from "@/data/news";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "お知らせ",
   description: "HUMAN INFINITY ACADEMY からのお知らせ一覧です。",
@@ -21,8 +23,9 @@ const categoryColors: Record<string, string> = {
   "メディア": "bg-sky-soft/20",
 };
 
-export default function NewsPage() {
-  const sorted = getNewsArticles().sort((a, b) =>
+export default async function NewsPage() {
+  const articles = await getNewsArticles();
+  const sorted = articles.sort((a, b) =>
     b.date.localeCompare(a.date)
   );
 

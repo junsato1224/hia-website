@@ -12,7 +12,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
   if (!auth.authenticated) return auth.response;
 
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug);
   if (!article) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 
   try {
-    updateArticle(slug, updated);
+    await updateArticle(slug, updated);
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json(
@@ -47,7 +47,7 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
 
   const { slug } = await params;
   try {
-    deleteArticle(slug);
+    await deleteArticle(slug);
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json(

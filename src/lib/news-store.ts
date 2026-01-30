@@ -1,46 +1,75 @@
+import { put, list } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 import type { NewsArticle } from "@/types";
 
-const DATA_PATH = path.join(process.cwd(), "data", "news.json");
+const BLOB_PATH = "news.json";
+const LOCAL_PATH = path.join(process.cwd(), "data", "news.json");
 
-export function readNews(): NewsArticle[] {
-  const raw = fs.readFileSync(DATA_PATH, "utf-8");
-  return JSON.parse(raw) as NewsArticle[];
+function readLocalNews(): NewsArticle[] {
+  try {
+    const raw = fs.readFileSync(LOCAL_PATH, "utf-8");
+    return JSON.parse(raw) as NewsArticle[];
+  } catch {
+    return [];
+  }
 }
 
-export function writeNews(articles: NewsArticle[]): void {
-  fs.writeFileSync(DATA_PATH, JSON.stringify(articles, null, 2) + "\n", "utf-8");
+export async function readNews(): Promise<NewsArticle[]> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return readLocalNews();
+  }
+
+  const { blobs } = await list({ prefix: BLOB_PATH });
+  if (blobs.length === 0) {
+    return readLocalNews();
+  }
+  const res = await fetch(blobs[0].url);
+  return (await res.json()) as NewsArticle[];
 }
 
-export function getArticleBySlug(slug: string): NewsArticle | undefined {
-  return readNews().find((a) => a.slug === slug);
+async function writeNews(articles: NewsArticle[]): Promise<void> {
+  await put(BLOB_PATH, JSON.stringify(articles, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+    contentType: "application/json",
+  });
 }
 
-export function createArticle(article: NewsArticle): void {
-  const articles = readNews();
+export async function getArticleBySlug(
+  slug: string
+): Promise<NewsArticle | undefined> {
+  const articles = await readNews();
+  return articles.find((a) => a.slug === slug);
+}
+
+export async function createArticle(article: NewsArticle): Promise<void> {
+  const articles = await readNews();
   if (articles.some((a) => a.slug === article.slug)) {
     throw new Error(`Slug "${article.slug}" already exists`);
   }
   articles.unshift(article);
-  writeNews(articles);
+  await writeNews(articles);
 }
 
-export function updateArticle(slug: string, updated: NewsArticle): void {
-  const articles = readNews();
+export async function updateArticle(
+  slug: string,
+  updated: NewsArticle
+): Promise<void> {
+  const articles = await readNews();
   const index = articles.findIndex((a) => a.slug === slug);
   if (index === -1) {
     throw new Error(`Article "${slug}" not found`);
   }
   articles[index] = updated;
-  writeNews(articles);
+  await writeNews(articles);
 }
 
-export function deleteArticle(slug: string): void {
-  const articles = readNews();
+export async function deleteArticle(slug: string): Promise<void> {
+  const articles = await readNews();
   const filtered = articles.filter((a) => a.slug !== slug);
   if (filtered.length === articles.length) {
     throw new Error(`Article "${slug}" not found`);
   }
-  writeNews(filtered);
+  await writeNews(filtered);
 }

@@ -8,8 +8,8 @@ function formatDate(dateStr: string): string {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
 }
 
-export function NewsPreview() {
-  const latestNews = getLatestNews(3);
+export async function NewsPreview() {
+  const latestNews = await getLatestNews(3);
 
   return (
     <section className="bg-warm-gray py-20">

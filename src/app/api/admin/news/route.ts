@@ -7,7 +7,7 @@ export async function GET() {
   const auth = await requireAuth();
   if (!auth.authenticated) return auth.response;
 
-  const articles = readNews();
+  const articles = await readNews();
   return NextResponse.json(articles);
 }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    createArticle(article);
+    await createArticle(article);
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (e) {
     return NextResponse.json(

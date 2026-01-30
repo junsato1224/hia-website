@@ -1,16 +1,20 @@
 import type { NewsArticle } from "@/types";
 import { readNews } from "@/lib/news-store";
 
-export function getNewsArticles(): NewsArticle[] {
+export async function getNewsArticles(): Promise<NewsArticle[]> {
   return readNews();
 }
 
-export function getNewsArticle(slug: string): NewsArticle | undefined {
-  return readNews().find((a) => a.slug === slug);
+export async function getNewsArticle(
+  slug: string
+): Promise<NewsArticle | undefined> {
+  const articles = await readNews();
+  return articles.find((a) => a.slug === slug);
 }
 
-export function getLatestNews(count: number): NewsArticle[] {
-  return readNews()
+export async function getLatestNews(count: number): Promise<NewsArticle[]> {
+  const articles = await readNews();
+  return articles
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, count);
 }
