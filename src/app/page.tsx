@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Hero } from "@/components/sections/hero";
 import { MissionStatement } from "@/components/sections/mission-statement";
 import { Pillars } from "@/components/sections/pillars";

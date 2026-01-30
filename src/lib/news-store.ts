@@ -24,7 +24,7 @@ export async function readNews(): Promise<NewsArticle[]> {
   if (blobs.length === 0) {
     return readLocalNews();
   }
-  const res = await fetch(blobs[0].url);
+  const res = await fetch(blobs[0].url, { cache: "no-store" });
   return (await res.json()) as NewsArticle[];
 }
 
